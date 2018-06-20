@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.gwz.atcrowdfunding.dao.RoleDao" >
+	<select id="queryPageRoles" resultType="com.gwz.atcrowfunding.bean.Role">
+		select * from t_role
+		<where>
+			<if test="queryContent != null">
+				and role like concat('%', #{queryContent}, '%')
+			</if>
+		</where>
+		order by createtime desc
+		limit #{start},#{size}
+	</select>
+	<select id="queryPageCount" resultType="int">
+		select count(*) from t_role
+		<where>
+			<if test="queryContent != null">
+				and role like concat('%', #{queryContent}, '%')
+			</if>
+		</where>
+	</select>
+	
+	<insert id="insertRole">
+		insert into t_role (role , createtime) values(#{role} , #{createtime})
+	</insert>
+	
+	<insert id="insertRolePermissions">
+        insert into t_role_permission (
+            roleid, permissionid
+        ) values
+        <foreach collection="permissionids" item="p" separator=",">
+        ( #{roleid}, #{p.id} )
+        </foreach>
+    </insert>
+	
+	<update id="updateRole">
+		update t_role
+		set 
+			role = #{role}
+		where id = #{id}
+	</update>
+	
+	<delete id="deleteRoles">
+		delete from t_role where id in
+		<foreach collection="roles" item="role" separator="," open="(" close=")">
+			#{role.id}
+		</foreach>
+	</delete>
+</mapper>
